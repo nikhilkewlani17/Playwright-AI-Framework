@@ -1,14 +1,14 @@
 import {test,expect} from '@playwright/test';
 
-test("Login", async ({page}) =>{
+test("User should login successfully with valid credentials", async ({page}) =>{
   await page.goto("https://www.saucedemo.com/");
-  let username;
-  let password;
-  username = await page.getByPlaceholder('Username').fill('standard_user');
-  password = await page.getByPlaceholder('Password').fill('secret_sauce');
-  let button = await page.locator('#login-button').click();
-  const URL = await page.url();
-  console.log(URL);
-  await expect(page).toHaveURL(URL);
-
+  await page.getByPlaceholder('Username').fill('standard_user');
+  await page.getByPlaceholder('Password').fill('secret_sauce');
+//   await page.locator('#login-button').click();
+  await page.getByRole('button', {name : "Login"}).click();
+  await expect(page.getByText('Products')).toBeVisible();
+//   await expect(page.locator('.title')).toHaveText('Products');
+//   const URL = await page.url();
+//   console.log(URL);
+//   await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
 })
