@@ -1,25 +1,32 @@
 import {test,expect} from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
+import { InventoryPage } from '../pages/InventoryPage';
+import { CartPage } from '../pages/CartPage';
 
 test("User should login successfully with valid credentials", async ({page}) =>{
-  await page.goto("https://www.saucedemo.com/");
-  await page.getByPlaceholder('Username').fill('standard_user');
-  await page.getByPlaceholder('Password').fill('secret_sauce');
-//   await page.locator('#login-button').click();
-  await page.getByRole('button', {name : "Login"}).click();
-  await expect(page.getByText('Products')).toBeVisible();
-//   await expect(page.locator('.title')).toHaveText('Products');
-//   const URL = await page.url();
-//   console.log(URL);
-//   await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
-  const products = await page.locator('.inventory_item_name')
-  const productsCount = await products.count();
+
+  const username = 'standard_user';
+  const password = 'secret_sauce';
+  const logInpage = new LoginPage(page);
+  const inventoryPage = new InventoryPage(page);
+  const cartPage = new CartPage(page);
+
+  await logInpage.goTo()
+  await logInpage.login(username, password);
+  await expect(inventoryPage.productsTitle).toBeVisible();
+
+  const products = inventoryPage.productsName;
+  const productsCount = await inventoryPage.products.count();
+
   console.log(productsCount);
   
-  for(let i = 0; i < productsCount; i++){
-    const productsName = await products.nth(i).textContent();
-    console.log(productsName)
-  }
-  await page.getByText('Sauce Labs Backpack').click();
-  expect(page.getByText('carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection.')).toBeVisible();
+  const productsName = await inventoryPage.getProductsName();
+  console.log(productsName)
+  
+  await inventoryPage.addProductToCart("Sauce Labs Backpack");
+  await inventoryPage.openCart();
+  await expect(cartPage.cartPageTitle).toBeVisible();
+  // await page.getByText('Sauce Labs Backpack').click();
+  // await expect(page.getByText('carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection.')).toBeVisible();
 
 });
